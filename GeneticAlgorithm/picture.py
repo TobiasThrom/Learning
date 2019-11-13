@@ -28,7 +28,13 @@ class Picture(Individual):
 
 
     def newIndividual(self, Individual):
-        pass
+        split = np.random.randint(0, self.size*self.size)
+        child = Picture(self.size)
+        child.picture = self.picture.flatten()
+        child.picture[split:] = Individual.picture.flatten()[split:]
+        child.picture = child.picture.reshape(self.size, self.size)
+        return child
+
 
     def getPicture(self):
         return self.picture
