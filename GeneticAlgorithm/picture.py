@@ -5,7 +5,7 @@ import random
 
 class Picture(Individual):
 
-    mutationFactor = 10
+    mutationFactor = 100
 
     def __init__(self, size):
         self.size = size
@@ -33,6 +33,7 @@ class Picture(Individual):
         child.picture = self.picture.flatten()
         child.picture[split:] = Individual.picture.flatten()[split:]
         child.picture = child.picture.reshape(self.size, self.size)
+        child.mutate()
         child.fitness = child.getFitness()
         return child
 
