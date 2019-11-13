@@ -33,6 +33,7 @@ class Picture(Individual):
         child.picture = self.picture.flatten()
         child.picture[split:] = Individual.picture.flatten()[split:]
         child.picture = child.picture.reshape(self.size, self.size)
+        child.fitness = child.getFitness()
         return child
 
 
