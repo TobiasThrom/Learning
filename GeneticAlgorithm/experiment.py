@@ -1,12 +1,10 @@
 from picture import Picture
+from population import Population
+from geneticAlgorithm import GeneticAlgorithm
 
 def main():
-    p = Picture(5)
-    p2 = Picture(5)
-    print(p.getPicture())
-    print(p2.getPicture())
-    p3 = p.newIndividual(p2)
-    print(p3.getPicture())
+    gen = GeneticAlgorithm(10)
+    gen.run()
 
 
 
