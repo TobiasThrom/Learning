@@ -16,14 +16,21 @@ class Picture(Individual):
         return np.sum(self.picture)
 
     def generateRandomPicture(self, size):
-        pic = np.random.random((size, size))
+        pic = np.random.randint(2, size=(size, size))
         pic = np.array(pic * 255, dtype=np.uint8)
         return pic
 
     def mutate(self):
-        mutation = np.random.random((self.size, self.size))
-        mutation = np.array((mutation-0.5)*self.mutationFactor)
-        self.picture = np.array(self.picture+mutation, dtype=np.uint8)
+        self.picture = self.picture.flatten()
+        for i in range(self.size*self.size):
+            rand = np.random.randint(10)
+            if rand == 0:
+                if self.picture[i] == 0:
+                    self.picture[i] = 255
+                else:
+                    self.picture[i] = 0
+        self.picture = self.picture.reshape(self.size, self.size)
+
 
 
 
