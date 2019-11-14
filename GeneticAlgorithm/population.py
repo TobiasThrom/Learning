@@ -6,7 +6,7 @@ class Population():
         self.popSize = popSize
         self.indiviuals = []
         for i in range(popSize):
-            self.indiviuals.append(Picture(5))
+            self.indiviuals.append(Picture(10))
     
     def getFittestIdx(self):
         fittest = self.indiviuals[0]
@@ -38,6 +38,7 @@ class Population():
             avgFitness += i.getFitness()
         avgFitness = avgFitness/self.popSize
         print("Avg Fitness:", avgFitness)
+        return self.generation, self.getIndividual(fittest).getFitness(), avgFitness
     
     def increaseGeneration(self):
         self.generation +=1
