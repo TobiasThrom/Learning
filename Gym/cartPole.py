@@ -2,7 +2,6 @@ import random
 import gym
 import math
 import numpy as np
-import pyglet
 from collections import deque
 from keras.models import Sequential
 from keras.layers import Dense
