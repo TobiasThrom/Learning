@@ -7,9 +7,9 @@ import random
 import os
 import numpy as np
 
-class Agent:
-    def __init__(self, n_episodes= 10000, learning_rate= 0.001, batch_size = 32, gamma = 0.9, epsilon = 1.0, epsilon_decay = 0.9995, epsilon_min = 0.1):
-        self.env = gym.make('CartPole-v0')
+class DQNAgent:
+    def __init__(self, n_episodes= 10000, learning_rate= 0.001, batch_size = 32, gamma = 0.9, epsilon = 1.0, epsilon_decay = 0.999, epsilon_min = 0.1, environment='CartPole-v0'):
+        self.env = gym.make(environment)
         self.batch_size = batch_size
         self.n_episodes = n_episodes
         self.learning_rate = learning_rate
@@ -17,7 +17,7 @@ class Agent:
         self.observation_size = self.env.observation_space.shape[0] 
         print(self.observation_size)
         self.model = self.build_model()
-        self.memory = deque(maxlen=100000)  #stores past actions
+        self.memory = deque(maxlen=2000)    #stores past actions
         self.gamma = gamma                  #disount factor
         self.epsilon = epsilon              #exploration rate
         self.epsilon_decay = epsilon_decay  #shift to exploitation over time of training
@@ -47,7 +47,7 @@ class Agent:
     def act_det(self,state):
         act_values = self.model.predict(state)
         return np.argmax(act_values[0])
-            
+
     def replay(self):
         minibatch = random.sample(self.memory, self.batch_size)
 
@@ -91,11 +91,12 @@ class Agent:
                 self.replay()
             if e % 500 == 0:
                 agent.save(self.output_dir + 'weights_' + '{:04d}'.format(e) + ".hdf5")
+            #TODO: add test every 100 episodes to measure performance without random action selection (use act_det)
         return e 
 
         
 
 if __name__ == '__main__':
 
-    agent = Agent()
+    agent = DQNAgent(environment='MountainCar-v0')
     agent.run()
