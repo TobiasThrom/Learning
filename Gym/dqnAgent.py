@@ -6,9 +6,13 @@ from collections import deque
 import random
 import os
 import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+import pandas as pd
+
 
 class DQNAgent:
-    def __init__(self, n_episodes= 10000, learning_rate= 0.001, batch_size = 32, gamma = 0.9, epsilon = 1.0, epsilon_decay = 0.999, epsilon_min = 0.1, environment='CartPole-v0'):
+    def __init__(self, n_episodes= 1000, learning_rate= 0.001, batch_size = 32, gamma = 0.9, epsilon = 1.0, epsilon_decay = 0.999, epsilon_min = 0.1, environment='CartPole-v0'):
         self.env = gym.make(environment)
         self.batch_size = batch_size
         self.n_episodes = n_episodes
@@ -44,7 +48,7 @@ class DQNAgent:
         act_values = self.model.predict(state)
         return np.argmax(act_values[0])
     
-    def act_det(self,state):
+    def act_det(self, state):
         act_values = self.model.predict(state)
         return np.argmax(act_values[0])
 
@@ -71,15 +75,15 @@ class DQNAgent:
 
 
     def run(self):
-    
+        test_scores = []
         for e in range(self.n_episodes):
             done = False
             state = self.env.reset()
             state = np.reshape(state, [1, self.observation_size])
             total_reward = 0
             while not done:
-                if e%50 == 0:
-                    self.env.render()
+                #if e%50 == 0:
+                    #self.env.render()
                 action = self.act(state)
                 next_state, reward, done, _ = self.env.step(action)
                 total_reward += reward
@@ -91,12 +95,36 @@ class DQNAgent:
                 self.replay()
             if e % 500 == 0:
                 agent.save(self.output_dir + 'weights_' + '{:04d}'.format(e) + ".hdf5")
-            #TODO: add test every 100 episodes to measure performance without random action selection (use act_det)
+            if e % 100 == 0:
+                avg_reward = self.run_test()
+                test_scores.append([e,avg_reward])
+                print("ran test with avg score of: {}".format(avg_reward))
+        #TODO: Visualize performance on test set
+        avg_reward = self.run_test()
+        test_scores.append([e,avg_reward])
+        print("final test with avg score of: {}".format(avg_reward))
+        df = pd.DataFrame(test_scores, columns=['episode', 'avg_reward'])
+        ax = sns.lineplot(x='episode', y='avg_reward', data=df)
+        plt.show()
         return e 
 
-        
+    #run 100 test scenarios to evaulate the performance of the agent
+    def run_test(self):
+        total_reward = 0
+        for i in range(100):
+            done = False
+            state = self.env.reset()
+            state = np.reshape(state, [1, self.observation_size])
+            while not done:
+                action = self.act_det(state)
+                next_state, reward, done, _ = self.env.step(action)
+                total_reward += reward
+                next_state = np.reshape(next_state, [1, self.observation_size])
+                state = next_state
+        avg_reward = total_reward/100
+        return avg_reward
 
 if __name__ == '__main__':
 
-    agent = DQNAgent(environment='MountainCar-v0')
+    agent = DQNAgent(environment='CartPole-v0', epsilon_decay= 0.99)
     agent.run()
