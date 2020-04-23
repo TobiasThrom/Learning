@@ -23,7 +23,7 @@ class DQNAgent:
         self.epsilon_decay = epsilon_decay  #shift to exploitation over time of training
         self.epsilon_min = epsilon_min      #min exploration rate
 
-        self.output_dir= 'model_output/MountainCar'
+        self.output_dir = 'model_output/'+environment+'/'
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
 
