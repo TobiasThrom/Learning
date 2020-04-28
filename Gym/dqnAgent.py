@@ -13,13 +13,13 @@ import pandas as pd
 
 class DQNAgent:
     def __init__(self, n_episodes= 1000, learning_rate= 0.001, batch_size = 32, gamma = 0.9, epsilon = 1.0, epsilon_decay = 0.999, epsilon_min = 0.1, environment='CartPole-v0'):
+        #TODO: fix random seed
         self.env = gym.make(environment)
         self.batch_size = batch_size
         self.n_episodes = n_episodes
         self.learning_rate = learning_rate
         self.action_size = self.env.action_space.n
         self.observation_size = self.env.observation_space.shape[0] 
-        print(self.observation_size)
         self.model = self.build_model()
         self.memory = deque(maxlen=2000)    #stores past actions
         self.gamma = gamma                  #disount factor
@@ -48,9 +48,6 @@ class DQNAgent:
         act_values = self.model.predict(state)
         return np.argmax(act_values[0])
     
-    def act_det(self, state):
-        act_values = self.model.predict(state)
-        return np.argmax(act_values[0])
 
     def replay(self):
         minibatch = random.sample(self.memory, self.batch_size)
@@ -110,18 +107,22 @@ class DQNAgent:
 
     #run 100 test scenarios to evaulate the performance of the agent
     def run_test(self):
+        #set epsilon 0 for test batch
+        elsilon_temp = self.epsilon
+        self.epsilon = 0.0
         total_reward = 0
         for i in range(100):
             done = False
             state = self.env.reset()
             state = np.reshape(state, [1, self.observation_size])
             while not done:
-                action = self.act_det(state)
+                action = self.act(state)
                 next_state, reward, done, _ = self.env.step(action)
                 total_reward += reward
                 next_state = np.reshape(next_state, [1, self.observation_size])
                 state = next_state
         avg_reward = total_reward/100
+        self.epsilon = elsilon_temp
         return avg_reward
 
 if __name__ == '__main__':
