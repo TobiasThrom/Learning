@@ -6,13 +6,13 @@ from collections import deque
 import random
 import os
 import numpy as np
-import seaborn as sns
-import matplotlib.pyplot as plt
-import pandas as pd
+#import seaborn as sns
+#import matplotlib.pyplot as plt
+#import pandas as pd
 
 
 class DQNAgent:
-    def __init__(self, n_episodes= 1000, learning_rate= 0.001, batch_size = 32, gamma = 0.9, epsilon = 1.0, epsilon_decay = 0.999, epsilon_min = 0.1, environment='CartPole-v0'):
+    def __init__(self, n_episodes= 1000, learning_rate= 0.001, batch_size = 32, gamma = 0.9, epsilon = 1.0, epsilon_decay = 0.99, epsilon_min = 0.1, environment='CartPole-v0'):
         #TODO: fix random seed
         self.env = gym.make(environment)
         self.batch_size = batch_size
@@ -79,10 +79,9 @@ class DQNAgent:
             state = np.reshape(state, [1, self.observation_size])
             total_reward = 0
             while not done:
-                #if e%50 == 0:
-                    #self.env.render()
                 action = self.act(state)
                 next_state, reward, done, _ = self.env.step(action)
+                reward += np.square(next_state[1])*1000
                 total_reward += reward
                 next_state = np.reshape(next_state, [1, self.observation_size])
                 self.remember(state, action, reward, next_state, done)
@@ -100,9 +99,9 @@ class DQNAgent:
         avg_reward = self.run_test()
         test_scores.append([e,avg_reward])
         print("final test with avg score of: {}".format(avg_reward))
-        df = pd.DataFrame(test_scores, columns=['episode', 'avg_reward'])
-        ax = sns.lineplot(x='episode', y='avg_reward', data=df)
-        plt.show()
+        #df = pd.DataFrame(test_scores, columns=['episode', 'avg_reward'])
+        #ax = sns.lineplot(x='episode', y='avg_reward', data=df)
+        #plt.show()
         return e 
 
     #run 100 test scenarios to evaulate the performance of the agent
@@ -116,6 +115,8 @@ class DQNAgent:
             state = self.env.reset()
             state = np.reshape(state, [1, self.observation_size])
             while not done:
+                if i%50 == 0:
+                    self.env.render()
                 action = self.act(state)
                 next_state, reward, done, _ = self.env.step(action)
                 total_reward += reward
@@ -127,5 +128,5 @@ class DQNAgent:
 
 if __name__ == '__main__':
 
-    agent = DQNAgent(environment='CartPole-v0', epsilon_decay= 0.99)
+    agent = DQNAgent(environment='MountainCar-v0', n_episodes= 20000, epsilon_decay=0.9999)
     agent.run()
